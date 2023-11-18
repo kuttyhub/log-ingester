@@ -1,0 +1,145 @@
+version: "3.8"
+services:
+  nignx:
+    image: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    depends_on:
+      ingester:
+        condition: service_healthy
+      worker:
+        condition: service_healthy
+    networks:
+      - ingester-network
+
+  ingester:
+    build:
+      context: ingester
+      dockerfile: /Dockerfile
+    ports:
+      - 3000
+    deploy:
+      replicas: 2
+    depends_on:
+      kafka:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      cassandra:
+        condition: service_healthy
+    healthcheck:
+      test: nc -z ingester 3000 || exit 1
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    environment:
+      KAFKA_HOST: kafka:9092
+      CASSANDRA_HOST: cassandra:9042
+      ELASTICSEARCH_HOST: elasticsearch:9200
+      task_id: "{{.Task.Slot}}"
+    networks:
+      - ingester-network
+
+  worker:
+    build:
+      context: worker
+      dockerfile: /Dockerfile
+    ports:
+      - "4000:4000"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      cassandra:
+        condition: service_healthy
+    healthcheck:
+      test: nc -z worker 4000 || exit 1
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    environment:
+      KAFKA_HOST: kafka:9092
+      CASSANDRA_HOST: cassandra:9042
+      ELASTICSEARCH_HOST: elasticsearch:9200
+    networks:
+      - ingester-network
+
+  elasticsearch:
+    image: elasticsearch:7.17.15
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --silent --fail elasticsearch:9200/_cluster/health || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - ingester-network
+
+  cassandra:
+    image: cassandra
+    ports:
+      - "9042:9042"
+    healthcheck:
+      test: cqlsh -u cassandra -p cassandra cassandra < /dev/null || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+      - ./scripts/setup-cassandra:/docker-entrypoint-initdb.d
+    networks:
+      - ingester-network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+      - "9092:9092"
+    healthcheck:
+      test: nc -z localhost 9092 || exit -1
+      interval: 1s
+      timeout: 60s
+      retries: 20
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:9092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "log-topic:1:1"
+    networks:
+      - ingester-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - ingester-network
+
+volumes:
+  cassandra_data:
+  elasticsearch-data:
+
+networks:
+  ingester-network:
