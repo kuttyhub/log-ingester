@@ -33,7 +33,7 @@ The following technologies were chosen for this project:
 
 The system is designed to leverage the strengths of different technologies for specific tasks. Cassandra is used for efficient log querying and filtering, Elasticsearch for full-text search, Kafka for message queuing, and Docker for containerization.
 
-<!-- ![System Architecture](/path/to/architecture-diagram.png) -->
+![System Architecture](image.png)
 
 ## Log Ingestor
 
