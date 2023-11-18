@@ -18,6 +18,7 @@ This project implements a log ingestor system and a query interface to efficient
 - [Data Insertion](#data-insertion)
 - [Advanced Features](#advanced-features)
 - [How to Run](#how-to-run)
+
 ## Technologies
 
 The following technologies were chosen for this project:
@@ -91,6 +92,4 @@ docker-compose up
 
 The log ingestor will be available on [http://localhost:3000](http://localhost:3000).
 
-check out the [api docs]() for interactions.
-
-
+check out the [api docs](/api-docs.md) for interactions.
