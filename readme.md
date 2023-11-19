@@ -76,20 +76,52 @@ Key Features:
 - **Elasticsearch:** Used for full-text search capabilities.
 
 ## How to Run
+To get started with the Log Ingestor and Query Interface, follow the steps below:
 
-1. Clone this repository:
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/kuttyhub/log-ingestor.git
-cd log-ingestor
+git clone <repository-url>
+cd <repository-directory>
 ```
 
-2. Build and run the system using Docker Compose:
+### 2. Build Docker Images
+
+```bash
+docker-compose build
+```
+
+### 3. Run the Docker Compose
 
 ```bash
 docker-compose up
 ```
 
-The log ingestor will be available on [http://localhost:3000](http://localhost:3000).
+This command will start the Ingester, Worker, Nginx, Cassandra, and other services.
 
-check out the [api docs](/api-docs.md) for interactions.
+### 4. Setting Up Cassandra Tables (First time)
+
+For some reason, the setup file for Cassandra tables is not automatically executed during container startup. To seamlessly set up Cassandra tables:
+
+1. **Identify Cassandra Container ID:**
+
+   ```bash
+   docker ps
+   ```
+
+   Identify the container ID for the Cassandra instance.
+
+2. **Run Setup Script:**
+
+   ```bash
+   docker cp ./setup-cassandra.cql <container-id>:/
+   docker exec <container-id> bin/sh -c "cqlsh --file setup-cassandra.cql;"
+   ```
+
+   Replace `<container-id>` with the actual container ID obtained in step 1.
+
+### 5. Access the Query Interface
+
+Visit [http://localhost:3000](http://localhost:3000) to access the Query Interface.
+
+check out the [API docs](/api-docs.md) for interactions.
