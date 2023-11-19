@@ -35,7 +35,7 @@ fi
 # Continue with the rest of the script...
 
 # Replace 'your_json_file.json' with the actual JSON file name
-JSON_FILE="your_json_file.json"
+JSON_FILE="MOCK_DATA.json"
 
 # Check if the JSON file exists
 if [ ! -f "$JSON_FILE" ]; then
