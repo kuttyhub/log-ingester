@@ -16,7 +16,6 @@ esClient
     requestTimeout: 30000,
   })
   .then(() => console.log("Success! Elasticsearch cluster is up!"))
-  .catch((err) => console.error("Elasticsearch is down", err));
 
 const insertIntoES = async (id: string, log: Log) => {
   // Insert into Elasticsearch

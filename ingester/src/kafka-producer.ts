@@ -12,10 +12,7 @@ const producer = kafka.producer({
   createPartitioner: Partitioners.LegacyPartitioner,
 });
 const initKafkaProducer = async () => {
-  await producer
-    .connect()
-    .then(() => console.log("Kafka Producer is ready"))
-    .catch((err) => console.error("Error in Kafka Producer:", err));
+  await producer.connect().then(() => console.log("Kafka Producer is ready"));
 
   return producer;
 };

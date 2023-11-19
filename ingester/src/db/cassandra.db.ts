@@ -22,6 +22,5 @@ const client = new Client({
 client
   .connect()
   .then(() => console.log("Connected to Cassandra"))
-  .catch((err) => console.error("Error on Connection cassandra", err));
 
 export { client as cassandraClient };

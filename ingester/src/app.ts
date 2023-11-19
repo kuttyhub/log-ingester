@@ -16,9 +16,7 @@ let producer: Producer;
 
 app.listen(port, async () => {
   producer = await initKafkaProducer();
-  console.log(
-    `Log Ingestor server is running at http://localhost:${port} on ${process.env.task_id}`
-  );
+  console.log(`Log Ingestor server is running at http://localhost:${port}`);
 });
 
 process.on("SIGINT", async () => {

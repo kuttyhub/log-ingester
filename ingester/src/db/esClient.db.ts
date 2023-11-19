@@ -14,7 +14,6 @@ esClient
   .ping(undefined, {
     requestTimeout: 30000,
   })
-  .then(() => console.log("Success! Elasticsearch cluster is up!"))
-  .catch((err) => console.error("Elasticsearch is down", err));
+  .then(() => console.log("Success! Elasticsearch cluster is up!"));
 
 export { esClient };
