@@ -1,5 +1,3 @@
-Certainly! Below is an example of how you can structure your API documentation using Markdown for both the GET and POST endpoints:
-
 ## Log Ingestor API Documentation
 
 ### Base URL: `http://localhost:3000`
