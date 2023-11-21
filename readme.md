@@ -1,7 +1,3 @@
-Certainly! Below is an updated README that includes details about Kafka integration and data insertion into both Cassandra and Elasticsearch.
-
----
-
 # Log Ingestor and Query Interface
 
 ## Overview
